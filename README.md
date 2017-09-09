@@ -1,3 +1,5 @@
+![](screenshot.png)
+
 ### Used Libraries:
 
 1. GLEW 2 ( http://glew.sourceforge.net/ )

@@ -12,7 +12,7 @@ Heightmap::Heightmap(int seed, FastNoise::NoiseType type, FastNoise::FractalType
 
 	noise_generator.SetCellularDistanceFunction(FastNoise::CellularDistanceFunction::Euclidean);
 	noise_generator.SetCellularReturnType(FastNoise::CellularReturnType::Distance2Add);
-	noise_generator.SetFrequency(0.004);
+	noise_generator.SetFrequency(0.004f);
 	noise_generator.SetInterp(FastNoise::Interp::Quintic);
 }
 
@@ -52,6 +52,10 @@ glm::vec3 Heightmap::get_position()
 	return position;
 }
 
+float Heightmap::get_max_height() {
+	return max_height;
+}
+
 std::pair<std::vector<Vertex>, std::vector<unsigned int>>* Heightmap::get_last_raw()
 {
 	return &last_raw;
@@ -65,45 +69,43 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 {
 	glm::vec2 size = end - begin;
 
-	int width = size.x;
-	int height = size.y;
+	int width = (int) size.x;
+	int height = (int) size.y;
 
-	float tX = 0.0f;
-	float tY = size.y * texture_resolution;
+	float u = 0.0f;
+	float v = size.y * texture_resolution;
 
-	int i = 0;
+	float lastZ = begin.y;
+
+	float beginX = begin.x;
+	float beginY = begin.y;
+
 	int j = 0;
-
-	int lastZ = begin.y;
-
-	int beginX = begin.x;
-	int beginY = begin.y;
 
 	for (int i = 0; i < vertices.size(); i++) {
 
-		int x = ( i % width + beginX) * resolution;
+		float x = ( i % width + beginX) * resolution;
 
-		x == beginX ? tX = 0.0f : tX += 1.0f * texture_resolution; // for every increase in x, increase tX, and reset tX to 0 when x = 0
+		x == beginX ? u = 0.0f : u += 1.0f * texture_resolution; // for every increase in x, increase tX, and reset tX to 0 when x = 0
 
-		int z = ( i / width + beginY) * resolution;
+		float z = ( i / width + beginY) * resolution;
 
 		if (z != lastZ) { // for every increase in z, decrease tY
-			tY -= 1.0f * texture_resolution;
+			v -= 1.0f * texture_resolution;
 			lastZ+= resolution;
 		}
 
-		const float y = get_value_at(x, z, max_height);
-		vertices[i].position = { x, y, z };
-		vertices[i].texture = { tX, tY, get_material_at(y) };
+		const FN_DECIMAL y = get_value_at(x, z, max_height);
+		vertices[i].position = { (float) x, (float) y, (float) z };
+		vertices[i].uv = { u, v };
 		//vertices[i].normal = { 0, 0, 0 };
 
 		if (z == beginY * resolution || x == beginX * resolution) {
 			// a vertex with either z or x equaling their beginning values is missing neighboring vertices requried to construct the quad
 			// just add vertex to vertices vector and continue
 			continue;
-		}
-
-		if (z != beginY * resolution && x != beginX * resolution) {
+		} 
+		else if (z != beginY * resolution && x != beginX * resolution) {
 			// movement on both axis
 			// there are vertices prior to this one on the row
 			// there is at least 1 row above this one
@@ -111,10 +113,10 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 			// generate this vertex, find indices of other 3 vertices, calculate normals and save their indices
 
 			const int e[4] = {
-				i - size.y - 1,	// upper - left
-				i - 1,			// left
-				i - size.y,		// up
-				i				// this
+				i - (int) size.y - 1,	// upper - left
+				i - 1,					// left
+				i - (int) size.y,		// up
+				i						// this
 			};
 
 			Vertex* v1 = &vertices[e[0]];
@@ -140,8 +142,8 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 }
 
 
-float Heightmap::get_value_at(int x, int y, float amplification) {
-	return amplification * ( ( ( noise_generator.GetNoise(x, y) + 0.5f ) * (noise_generator.GetCellular(x, y) ) ) - 0.7f );
+FN_DECIMAL Heightmap::get_value_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification) {
+	return amplification * ( ( ( noise_generator.GetNoise(x, y) + (FN_DECIMAL) 0.5f ) * (noise_generator.GetCellular(x, y) ) ) - (FN_DECIMAL) 0.7f );
 }
 
 Heightmap::Material Heightmap::get_material_at ( float height )

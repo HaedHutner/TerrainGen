@@ -44,6 +44,8 @@ public:
 
 	glm::vec3 get_position();
 
+	float get_max_height();
+
 	std::pair<std::vector<Vertex>, std::vector<unsigned int>>* get_last_raw();
 
 	~Heightmap();
@@ -52,7 +54,7 @@ private:
 
 	void add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2& begin, const glm::vec2& end);
 
-	float get_value_at(int x, int y, float amplification = 1.0f);
+	FN_DECIMAL get_value_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification = 1.0f);
 
 	Material get_material_at( float height );
 };

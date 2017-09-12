@@ -3,7 +3,7 @@
 Camera::Camera(float fov, float cameraSpeed, float mouseSensitivity, int screenX, int screenY, glm::vec3 beginningCoords, glm::vec3 beginningDirection, glm::vec2 beginningRotation)
 	: camera_position(beginningCoords), camera_direction(beginningDirection), camera_target(beginningRotation, 0), field_of_view(fov), speed_modifyer(cameraSpeed), mouse_sensitivity(mouseSensitivity)
 {
-	projection = glm::perspective(glm::radians(fov), (float)screenX / screenY, 0.1f, 1000.0f);
+	update_projection(screenX, screenY);
 }
 
 Camera::~Camera() {
@@ -22,7 +22,7 @@ glm::vec3 Camera::get_position() { return camera_position; }
 
 void Camera::update_projection(int screenX, int screenY )
 {
-	projection = glm::perspective(glm::radians(field_of_view), (float)screenX / screenY, 0.1f, 1000.0f);
+	projection = glm::perspective(glm::radians(field_of_view), (double) screenX / screenY, 0.1, 1000.0);
 }
 
 void Camera::reset_cursor(float x, float y) {
@@ -54,11 +54,11 @@ void Camera::move(MoveDirection dir, float speed) {
 }
 
 void Camera::process_key_input(GLFWwindow * window) {
-	float currentFrame = glfwGetTime();
+	double currentFrame = glfwGetTime();
 	delta_time = currentFrame - last_frame;
 	last_frame = currentFrame;
 
-	float speed = speed_modifyer * delta_time;
+	double speed = speed_modifyer * delta_time;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) speed *= 10.0f;
 
@@ -94,8 +94,8 @@ void Camera::process_mouse_input(GLFWwindow * window, double x, double y) {
 		first_mouse = false;
 	}
 
-	float xOffset = x - last_x;
-	float yOffset = last_y - y;
+	double xOffset = x - last_x;
+	double yOffset = last_y - y;
 
 	xOffset *= mouse_sensitivity;
 	yOffset *= mouse_sensitivity;
@@ -107,9 +107,9 @@ void Camera::process_mouse_input(GLFWwindow * window, double x, double y) {
 	if (pitch < -89.0f) pitch = -89.0f;
 
 	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.x = (float) cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = (float) sin(glm::radians(pitch));
+	front.z = (float) sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
 	camera_front = glm::normalize(front);
 

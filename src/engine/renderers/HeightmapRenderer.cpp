@@ -14,7 +14,7 @@ HeightmapRenderer::HeightmapRenderer(ShaderProgram shader_program, Camera* camer
 	heightmap->populate_raw(STATIC_SIZE_X, STATIC_SIZE_Y);
 	double timeAfter = glfwGetTime();
 
-	std::cout << "Generating Terrain Took " << timeAfter - timeBefore << " time units " << std::endl;
+	std::cout << "Generating Terrain Took " << timeAfter - timeBefore << " seconds." << std::endl;
 
 	vertex_buffer_size = heightmap->get_last_raw()->first.size();
 	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size * sizeof(Vertex), &heightmap->get_last_raw()->first[0], GL_STATIC_DRAW);
@@ -31,8 +31,8 @@ HeightmapRenderer::HeightmapRenderer(ShaderProgram shader_program, Camera* camer
 	glBindFragDataLocation(shader_program.id(), 0, "out_color");
 
 	shader_program.set_attribute("vertex_position", GL_FLOAT, GL_FALSE, 3, sizeof(Vertex), 0);
-	shader_program.set_attribute("texture_coords",	GL_FLOAT, GL_FALSE, 3, sizeof(Vertex), (void*)(3 * sizeof(GLfloat)));
-	shader_program.set_attribute("normal",			GL_FLOAT, GL_FALSE, 3, sizeof(Vertex), (void*)(6 * sizeof(GLfloat)));
+	shader_program.set_attribute("texture_coords",	GL_FLOAT, GL_FALSE, 2, sizeof(Vertex), (void*)(3 * sizeof(GLfloat)));
+	shader_program.set_attribute("normal",			GL_FLOAT, GL_FALSE, 3, sizeof(Vertex), (void*)(5 * sizeof(GLfloat)));
 
 	sun_height = 1000.0f;
 	sun = Light(glm::vec3( heightmap->get_position().x , sun_height, heightmap->get_position().z ), glm::vec3(0.5, 0.5, 0.5));
@@ -64,6 +64,8 @@ void HeightmapRenderer::prepare()
 	shader_program.link();
 	shader_program.use();
 
+	shader_program.set_uniform_float("max_height", heightmap->get_max_height());
+
 #ifndef CAMERA_SUN
 	shader_program.set_uniform_vec3("light_position", sun.get_position());
 	shader_program.set_uniform_vec3("light_color", sun.get_color());
@@ -77,6 +79,7 @@ void HeightmapRenderer::prepare()
 	shader_program.set_uniform_mat4("model", glm::translate(glm::mat4(),heightmap->get_position()));
 	shader_program.set_uniform_mat4("view", camera->get_view());
 	shader_program.set_uniform_mat4("projection", camera->get_projection());
+
 	shader_program.set_uniform_int("textures", ground_textures.id());
 }
 

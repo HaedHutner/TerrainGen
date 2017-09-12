@@ -10,8 +10,8 @@ protected:
 	GLuint vertex_buffer;
 	GLuint element_buffer;
 
-	GLuint vertex_buffer_size;
-	GLuint element_buffer_size;
+	GLsizei vertex_buffer_size;
+	GLsizei element_buffer_size;
 
 	ShaderProgram shader_program;
 

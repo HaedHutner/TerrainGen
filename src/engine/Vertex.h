@@ -5,13 +5,13 @@
 
 struct Vertex {
 	glm::vec3 position;
-	glm::vec3 texture;
+	glm::vec2 uv;
 	glm::vec3 normal;
 
-	Vertex() : position(glm::vec3()), texture(glm::vec3()), normal(glm::vec3()) {
+	Vertex() : position(glm::vec3()), uv(glm::vec2()), normal(glm::vec3()) {
 	}
 
-	Vertex(glm::vec3 xyz, glm::vec3 textureCoords, glm::vec3 normal) : position(xyz), texture(textureCoords), normal(normal) {}
+	Vertex(glm::vec3 xyz, glm::vec2 textureCoords, glm::vec3 normal) : position(xyz), uv(textureCoords), normal(normal) {}
 
 	void calc_normal( const Vertex& v1, const Vertex& v2) {
 		glm::vec3 va = position - v1.position;

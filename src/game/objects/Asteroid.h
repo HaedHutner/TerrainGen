@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../noise/FastNoise.h"
-#include "../../engine/Vertex.h"
+#include "../../engine/objects/Vertex.hpp"
 #include <math.h>
 #include <glm\glm.hpp>
 #include <vector>

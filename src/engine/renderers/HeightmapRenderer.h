@@ -10,7 +10,7 @@
 #include "../../game/objects/Heightmap.h"
 #include "../../game/Log.h"
 
-#include "../Vertex.h"
+#include "../objects/Vertex.hpp"
 
 #define STATIC_SIZE_X 512
 #define STATIC_SIZE_Y 512

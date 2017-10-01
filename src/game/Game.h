@@ -3,15 +3,15 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 
-#include "../engine/Camera.h"
+#include "../engine/objects/Camera.h"
 
 #include "../engine/renderers/MasterRenderer.h"
 #include "../engine/renderers/CubemapRenderer.h"
-#include "../engine/renderers/HeightmapRenderer.h"
+#include "../engine/renderers/WorldRenderer.h"
 #include "../engine/renderers/AsteroidRenderer.h"
 
 #include "objects/Skybox.h"
-#include "objects/Heightmap.h"
+#include "objects/World.h"
 #include "Log.h"
 
 #define SCREEN_X 800

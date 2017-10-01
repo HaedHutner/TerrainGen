@@ -2,6 +2,15 @@
 
 CubemapRenderer::CubemapRenderer(ShaderProgram shader_program, Camera* camera, Skybox* skybox) : AbstractRenderer(shader_program, camera), skybox(skybox)
 {
+	glGenVertexArrays(1, &vertex_array);
+	glBindVertexArray(vertex_array);
+
+	glGenBuffers(1, &vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+
+	glGenBuffers(1, &element_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
+
 	vertex_buffer_size = skybox->Vertices.size();
 	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size * sizeof(GLfloat), &skybox->Vertices[0], GL_STATIC_DRAW);
 
@@ -39,4 +48,8 @@ void CubemapRenderer::post()
 CubemapRenderer::~CubemapRenderer()
 {
 	delete skybox;
+
+	glDeleteBuffers(1, &element_buffer);
+	glDeleteBuffers(1, &vertex_buffer);
+	glDeleteVertexArrays(1, &vertex_array);
 }

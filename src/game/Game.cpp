@@ -62,7 +62,11 @@ namespace Game {
 
 		camera = new Camera(120.0f, 5.0f, 0.5f, SCREEN_X, SCREEN_Y, { 0, 128.0f, 0 }, { 0, 0, 0 }, { -89.0f, -89.0f });
 		renderer = new MasterRenderer(camera);
-		renderer->add_renderer(new HeightmapRenderer(heightmapProgram, camera, map, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }));
+		//renderer->add_renderer(new HeightmapRenderer(heightmapProgram, camera, map, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }));
+
+		World* world = new World(map, glm::ivec2(32, 32));
+		Light* sun = new Light(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+		renderer->add_renderer(new WorldRenderer(world, sun, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }, camera, heightmapProgram));
 
 		Skybox* skybox = new Skybox({ "resources/textures/skybox_left.png", "resources/textures/skybox_right.png","resources/textures/skybox_top.png","resources/textures/skybox_bottom.png","resources/textures/skybox_back.png","resources/textures/skybox_front.png" });
 		renderer->add_renderer(new CubemapRenderer(skyboxProgram, camera, skybox));

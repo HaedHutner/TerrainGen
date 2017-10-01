@@ -23,11 +23,16 @@ void Heightmap::populate_raw(int height, int width) {
 	int offsetX = 0;
 	int offsetY = 0;
 
-	std::vector<Vertex> vertices( (width - offsetX) * ( height - offsetY));
-	std::vector<unsigned int> indices( (width - offsetX) * (height - offsetY) * 6);
-	add_vertices_3(vertices, indices, glm::vec2 ( offsetX, offsetY ), glm::vec2 ( height, width ) );
+	glm::vec2 begin(offsetX, offsetY);
+	glm::vec2 end(height, width);
 
-	last_raw = std::pair<std::vector<Vertex>, std::vector<unsigned int>>(vertices, indices);
+	glm::vec2 size = end - begin;
+
+	std::vector<Vertex> vertices( (int) size.x * size.y );
+	std::vector<unsigned int> indices( (int) size.x * size.y * 6);
+	add_vertices_3(vertices, indices, begin, end );
+
+	last_raw = new Mesh(vertices, indices);
 }
 
 // for procedural drawing
@@ -44,7 +49,12 @@ void Heightmap::populate_raw_at_position(int camX, int camZ, int range) {
 	
 	add_vertices_3(vertices, indices, glm::vec2( ( camZ - range ), ( camX - range ) ), glm::vec2( ( camZ + range ), ( camX + range ) ) );
 
-	last_raw = std::pair<std::vector<Vertex>, std::vector<unsigned int>>(vertices, indices);
+	last_raw = new Mesh(vertices, indices);
+}
+
+void Heightmap::populate_elements(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2 & begin, const glm::vec2 & end)
+{
+	add_vertices_3(vertices, indices, begin, end);
 }
 
 glm::vec3 Heightmap::get_position()
@@ -56,13 +66,14 @@ float Heightmap::get_max_height() {
 	return max_height;
 }
 
-std::pair<std::vector<Vertex>, std::vector<unsigned int>>* Heightmap::get_last_raw()
+Mesh* Heightmap::get_last_raw()
 {
-	return &last_raw;
+	return last_raw;
 }
 
 Heightmap::~Heightmap()
 {
+	delete last_raw;
 }
 
 void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2& begin, const glm::vec2& end)
@@ -72,7 +83,7 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 	int width = (int) size.x;
 	int height = (int) size.y;
 
-	float u = 0.0f;
+	float u = begin.x;
 	float v = size.y * texture_resolution;
 
 	float lastZ = begin.y;
@@ -84,15 +95,14 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 
 	for (int i = 0; i < vertices.size(); i++) {
 
-		float x = ( i % width + beginX) * resolution;
+		float x = ( i % width + beginX ) * resolution;
+		float z = ( i / width + beginY ) * resolution;
 
-		x == beginX ? u = 0.0f : u += 1.0f * texture_resolution; // for every increase in x, increase tX, and reset tX to 0 when x = 0
-
-		float z = ( i / width + beginY) * resolution;
+		x == beginX ? u = begin.x : u += 1.0f * texture_resolution; // for every increase in x, increase tX, and reset tX to 0 when x = 0
 
 		if (z != lastZ) { // for every increase in z, decrease tY
 			v -= 1.0f * texture_resolution;
-			lastZ+= resolution;
+			lastZ += resolution;
 		}
 
 		const FN_DECIMAL y = get_value_at(x, z, max_height);

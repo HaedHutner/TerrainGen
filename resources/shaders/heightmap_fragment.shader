@@ -1,4 +1,4 @@
-#version 430 core
+#version 330 core
 
 in vec3 texture_coordinates;
 in vec3 surface_normal;

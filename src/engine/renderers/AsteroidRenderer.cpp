@@ -3,6 +3,16 @@
 AsteroidRenderer::AsteroidRenderer(ShaderProgram shader_program, Camera * camera) 
 	: AbstractRenderer(shader_program, camera)
 {
+
+	glGenVertexArrays(1, &vertex_array);
+	glBindVertexArray(vertex_array);
+
+	glGenBuffers(1, &vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+
+	glGenBuffers(1, &element_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 	vertex_buffer_size = asteroid->get_raw()->first.size();
 	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size * sizeof(Vertex), &asteroid->get_raw()->first[0], GL_STATIC_DRAW);
@@ -49,4 +59,8 @@ AsteroidRenderer::~AsteroidRenderer()
 	for (int i = 0; i < asteroids.size(); i++) {
 		delete asteroids[i];
 	}
+
+	glDeleteBuffers(1, &element_buffer);
+	glDeleteBuffers(1, &vertex_buffer);
+	glDeleteVertexArrays(1, &vertex_array);
 }

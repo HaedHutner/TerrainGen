@@ -1,24 +1,18 @@
 #pragma once
 
 #include <GL\glew.h>
-#include "../ShaderProgram.h"
-#include "../Camera.h"
+#include "../objects/ShaderProgram.h"
+#include "../objects/Camera.h"
 
 class AbstractRenderer {
 protected:
-	GLuint vertex_array;
-	GLuint vertex_buffer;
-	GLuint element_buffer;
-
-	GLsizei vertex_buffer_size;
-	GLsizei element_buffer_size;
 
 	ShaderProgram shader_program;
 
 	Camera* camera;
 protected:
 
-	AbstractRenderer(ShaderProgram shader_program, Camera* camera);;
+	AbstractRenderer(const ShaderProgram& shader_program, Camera* camera);;
 
 	virtual void prepare() = 0;
 

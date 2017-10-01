@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "AbstractRenderer.h"
-#include "../Camera.h"
+#include "../objects/Camera.h"
 
 class MasterRenderer {
 private:

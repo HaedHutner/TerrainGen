@@ -5,7 +5,7 @@ World::World ( Heightmap* heightmap, glm::ivec2 chunk_size )
 {
 	for (int chunk_x = -2; chunk_x < 4; chunk_x++) {
 		for (int chunk_y = -2; chunk_y < 4; chunk_y++) {
-			chunks.push_back(new Chunk( glm::ivec2(chunk_x, chunk_y), this ) );
+			chunks.push_back(new Chunk(glm::ivec2(chunk_x, chunk_y), this));
 		}
 	}
 }

@@ -83,8 +83,8 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 	int width = (int) size.x;
 	int height = (int) size.y;
 
-	float u = begin.x;
-	float v = size.y * texture_resolution;
+	float u = 0;
+	float v = 1.0f * texture_resolution;
 
 	float lastZ = begin.y;
 
@@ -98,7 +98,7 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 		float x = ( i % width + beginX ) * resolution;
 		float z = ( i / width + beginY ) * resolution;
 
-		x == beginX ? u = begin.x : u += 1.0f * texture_resolution; // for every increase in x, increase tX, and reset tX to 0 when x = 0
+		x == beginX ? u = 0 : u += 1.0f * texture_resolution; // for every increase in x, increase tX, and reset tX to 0 when x = 0
 
 		if (z != lastZ) { // for every increase in z, decrease tY
 			v -= 1.0f * texture_resolution;

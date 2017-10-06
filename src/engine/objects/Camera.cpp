@@ -51,6 +51,8 @@ void Camera::move(MoveDirection dir, float speed) {
 		camera_position += glm::normalize(glm::cross(camera_front, camera_up)) * speed;
 		break;
 	}
+
+	std::cout << "Camera: " << camera_position.x << "; " << camera_position.z << "\n";
 }
 
 void Camera::process_key_input(GLFWwindow * window) {

@@ -23,8 +23,8 @@ namespace Game {
 			return false;
 		}
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_SAMPLES, 4);
 
@@ -52,7 +52,7 @@ namespace Game {
 		Log::info((const char*)glGetString(GL_VERSION));
 		Log::info((const char*)glGetString(GL_VENDOR));
 
-		Heightmap* map = new Heightmap( 112412, FastNoise::NoiseType::PerlinFractal, FastNoise::FractalType::FBM, glm::vec3 (0, 0, 0), 0.2f, 7, 2, 128.0f);
+		Heightmap* map = new Heightmap( 112412, FastNoise::NoiseType::PerlinFractal, FastNoise::FractalType::FBM, glm::vec3 (0, 0, 0), 0.2f, 7, 4, 128.0f);
 
 		Log::info("Loading Shaders...");
 		ShaderProgram heightmapProgram = ShaderProgram::from_files("resources/shaders/heightmap_vertex.shader", "resources/shaders/heightmap_fragment.shader");
@@ -66,10 +66,10 @@ namespace Game {
 
 		Log::info("Generating world...");
 		double before = glfwGetTime();
-		World* world = new World(map, glm::ivec2(32, 32));
+		World* world = new World(map, glm::ivec2(64,64));
 		double after = glfwGetTime();
 		Log::info(std::string("Generating world took " + std::to_string(after - before) + " seconds." ));
-		Light* sun = new Light(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+		Light* sun = new Light(glm::vec3(0, 100, 0), glm::vec3(1, 1, 1));
 		renderer->add_renderer(new WorldRenderer(world, sun, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }, camera, heightmapProgram));
 
 		Skybox* skybox = new Skybox({ "resources/textures/skybox_left.png", "resources/textures/skybox_right.png","resources/textures/skybox_top.png","resources/textures/skybox_bottom.png","resources/textures/skybox_back.png","resources/textures/skybox_front.png" });

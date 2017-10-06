@@ -19,4 +19,8 @@ struct Vertex {
 
 		normal = ( normal + glm::cross(va, vb) ) * 0.5f;
 	}
+
+	void cal_normal_2( void ( *height )( float, float, float ) ) {
+		normal = glm::vec3(1, 1, 1);
+	}
 };

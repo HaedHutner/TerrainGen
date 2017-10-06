@@ -10,7 +10,7 @@ void WorldRenderer::prepare()
 {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -27,6 +27,8 @@ void WorldRenderer::prepare()
 	shader_program.set_uniform_mat4("projection", camera->get_projection());
 
 	shader_program.set_uniform_int("textures", ground_textures.id());
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void WorldRenderer::draw()
@@ -38,6 +40,7 @@ void WorldRenderer::draw()
 
 void WorldRenderer::post()
 {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 WorldRenderer::~WorldRenderer()

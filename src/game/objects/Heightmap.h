@@ -1,7 +1,5 @@
 #pragma once
 
-#include <CImg.h>
-
 #include <math.h>
 #include <vector>
 #include <string>
@@ -57,9 +55,11 @@ public:
 
 private:
 
-	void add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2& begin, const glm::vec2& end);
+	void add_vertices_4 (std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::ivec2& begin, const glm::ivec2& end);
 
 	FN_DECIMAL get_value_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification = 1.0f);
+
+	glm::vec3 get_normal_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification = 1.0f);
 
 	Material get_material_at( float height );
 };

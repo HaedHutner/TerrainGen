@@ -23,9 +23,9 @@ glm::vec3 Asteroid::get_position()
 	return position;
 }
 
-std::pair<std::vector<Vertex>, std::vector<unsigned int>>* Asteroid::get_raw()
+Mesh* Asteroid::get_mesh()
 {
-	return &raw;
+	return mesh;
 }
 
 void Asteroid::populate_vertices()
@@ -36,7 +36,7 @@ void Asteroid::populate_vertices()
 
 	// TODO Generate spherical vertices and change position relative to radial vector based on noise
 
-	raw = std::pair<std::vector<Vertex>, std::vector<unsigned int>>(vertices, indices);
+	mesh = new Mesh(vertices, indices);
 }
 
 Asteroid::~Asteroid()

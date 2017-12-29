@@ -64,11 +64,8 @@ namespace Game {
 		renderer = new MasterRenderer(camera);
 		//renderer->add_renderer(new HeightmapRenderer(heightmapProgram, camera, map, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }));
 
-		Log::info("Generating world...");
-		double before = glfwGetTime();
 		World* world = new World(map, glm::ivec2(64,64));
-		double after = glfwGetTime();
-		Log::info(std::string("Generating world took " + std::to_string(after - before) + " seconds." ));
+
 		Light* sun = new Light(glm::vec3(0, 100, 0), glm::vec3(1, 1, 1));
 		renderer->add_renderer(new WorldRenderer(world, sun, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }, camera, heightmapProgram));
 

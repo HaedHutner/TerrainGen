@@ -19,8 +19,6 @@ class Mesh {
 
 public:
 
-	Mesh();
-
 	Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& elements);
 
 	std::vector<Vertex>* get_vertices();

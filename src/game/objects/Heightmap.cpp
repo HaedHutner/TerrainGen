@@ -95,8 +95,8 @@ void Heightmap::add_vertices_4(std::vector<Vertex>& vertices, std::vector<unsign
 			i - (size.y) - 1    // bottom - left
 		};
 
-		const float x = (i % size.y + begin.x) * resolution;
-		const float z = (i / size.y + begin.y) * resolution;
+		const float x = (chunk_x + begin.x) * resolution;
+		const float z = (chunk_z + begin.y) * resolution;
 
 		const FN_DECIMAL y = get_value_at(x, z, max_height);
 		vertices[i].position = { (float)x, (float)y, (float)z };

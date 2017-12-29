@@ -24,7 +24,11 @@ public:
 
 	Heightmap* get_heightmap();
 
-	void populate(glm::ivec2 start, glm::ivec2 end);
+	Chunk* get_chunk(glm::ivec2 coordinates);
+
+	glm::ivec2 get_chunk_coordinates(glm::ivec2 position);
+
+	std::vector<Chunk*> get_chunks_surrounding(glm::ivec2 position, glm::ivec2 size);
 
 	std::vector<Chunk*> get_chunks();
 

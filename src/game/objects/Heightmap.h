@@ -6,6 +6,7 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
+#include <thread>
 
 #include "../../noise/FastNoise.h"
 #include "../../engine/objects/Vertex.hpp"

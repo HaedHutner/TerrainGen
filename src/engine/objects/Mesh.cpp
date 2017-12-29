@@ -1,11 +1,5 @@
 #include "Mesh.h"
 
-Mesh::Mesh() 
-	: vertices(), elements()
-{
-
-}
-
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& elements)
 	: vertices(vertices), elements(elements)
 {

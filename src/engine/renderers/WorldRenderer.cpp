@@ -33,14 +33,15 @@ void WorldRenderer::prepare()
 
 void WorldRenderer::draw()
 {
-	for (int i = 0; i < world->get_chunks().size(); i++) {
-		world->get_chunks()[i]->get_terrain()->draw(shader_program);
+	std::vector<Chunk*> chunks = world->get_chunks_surrounding({ camera->get_position().x, camera->get_position().z }, glm::ivec2(2, 2));
+	for (int i = 0; i < chunks.size(); i++) {
+		chunks[i]->get_terrain()->draw(shader_program);
 	}
 }
 
 void WorldRenderer::post()
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 WorldRenderer::~WorldRenderer()

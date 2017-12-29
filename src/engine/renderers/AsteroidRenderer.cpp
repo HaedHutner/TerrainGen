@@ -14,8 +14,8 @@ AsteroidRenderer::AsteroidRenderer(ShaderProgram shader_program, Camera * camera
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	vertex_buffer_size = asteroid->get_raw()->first.size();
-	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size * sizeof(Vertex), &asteroid->get_raw()->first[0], GL_STATIC_DRAW);
+	//vertex_buffer_size = asteroid->get_raw()->first.size();
+	//glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size * sizeof(Vertex), &asteroid->get_raw()->first[0], GL_STATIC_DRAW);
 
 	shader_program.link();
 	shader_program.use();
@@ -35,8 +35,8 @@ void AsteroidRenderer::prepare()
 	shader_program.use();
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	vertex_buffer_size = asteroid->get_raw()->first.size();
-	glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_buffer_size * sizeof(Vertex), &asteroid->get_raw()->first[0]);
+	//vertex_buffer_size = asteroid->get_raw()->first.size();
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_buffer_size * sizeof(Vertex), &asteroid->get_raw()->first[0]);
 
 	shader_program.set_uniform_mat4("model", glm::translate(glm::mat4(), asteroid->get_position()));
 	shader_program.set_uniform_mat4("view", camera->get_view());

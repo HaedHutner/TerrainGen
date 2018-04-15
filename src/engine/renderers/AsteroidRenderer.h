@@ -2,12 +2,15 @@
 
 #include "AbstractRenderer.h"
 
-#include "../Vertex.h"
+#include "../objects/Vertex.hpp"
 #include "../../game/objects/Asteroid.h"
 
 #include <vector>
 
 class AsteroidRenderer : public AbstractRenderer {
+
+	GLuint vertex_array, vertex_buffer, element_buffer;
+	GLsizei vertex_buffer_size, element_buffer_size;
 
 	std::vector<Asteroid*> asteroids;
 

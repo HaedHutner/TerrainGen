@@ -6,7 +6,7 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\type_ptr.hpp>
 
-#include "../util/FileUtils.h"
+#include "../../util/FileUtils.h"
 
 class ShaderProgram {
 private:

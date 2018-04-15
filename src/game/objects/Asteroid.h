@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../engine/objects/Mesh.h"
 #include "../../noise/FastNoise.h"
-#include "../../engine/Vertex.h"
 #include <math.h>
 #include <glm\glm.hpp>
 #include <vector>
@@ -10,11 +10,13 @@ class Asteroid {
 
 	static FastNoise noise_generator;
 
+
+
 	int seed;
 	float radius;
 	glm::vec3 position;
 
-	std::pair<std::vector<Vertex>, std::vector<unsigned int>> raw;
+	Mesh* mesh;
 	
 public:
 
@@ -26,7 +28,7 @@ public:
 
 	glm::vec3 get_position();
 
-	std::pair<std::vector<Vertex>, std::vector<unsigned int>>* get_raw();
+	Mesh* get_mesh();
 
 	~Asteroid();
 

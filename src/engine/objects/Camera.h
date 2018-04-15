@@ -10,11 +10,11 @@
 
 class Camera {
 private:
-	float last_frame = 0;
-	float delta_time = 0;
+	double last_frame = 0;
+	double delta_time = 0;
 
-	float speed_modifyer = 2.5f;
-	float mouse_sensitivity = 0.2f;
+	double speed_modifyer = 2.5f;
+	double mouse_sensitivity = 0.2f;
 
 	glm::vec3 camera_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 camera_target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -27,11 +27,11 @@ private:
 	glm::mat4 projection;
 
 	bool first_mouse = true;
-	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-	float pitch = 0.0f;
-	float last_x;
-	float last_y;
-	float field_of_view = 90.0f;
+	double yaw = -90.0;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+	double pitch = 0.0;
+	double last_x;
+	double last_y;
+	double field_of_view = 90.0;
 public:
 	enum MoveDirection {
 		UP,

@@ -12,7 +12,7 @@ Heightmap::Heightmap(int seed, FastNoise::NoiseType type, FastNoise::FractalType
 
 	noise_generator.SetCellularDistanceFunction(FastNoise::CellularDistanceFunction::Euclidean);
 	noise_generator.SetCellularReturnType(FastNoise::CellularReturnType::Distance2Add);
-	noise_generator.SetFrequency(0.004);
+	noise_generator.SetFrequency(0.004f);
 	noise_generator.SetInterp(FastNoise::Interp::Quintic);
 }
 
@@ -23,11 +23,16 @@ void Heightmap::populate_raw(int height, int width) {
 	int offsetX = 0;
 	int offsetY = 0;
 
-	std::vector<Vertex> vertices( (width - offsetX) * ( height - offsetY));
-	std::vector<unsigned int> indices( (width - offsetX) * (height - offsetY) * 6);
-	add_vertices_3(vertices, indices, glm::vec2 ( offsetX, offsetY ), glm::vec2 ( height, width ) );
+	glm::vec2 begin(offsetX, offsetY);
+	glm::vec2 end(height, width);
 
-	last_raw = std::pair<std::vector<Vertex>, std::vector<unsigned int>>(vertices, indices);
+	glm::vec2 size = end - begin;
+
+	std::vector<Vertex> vertices( (int) size.x * size.y );
+	std::vector<unsigned int> indices( (int) size.x * size.y * 6);
+	add_vertices_4(vertices, indices, begin, end );
+
+	last_raw = new Mesh(vertices, indices);
 }
 
 // for procedural drawing
@@ -42,9 +47,14 @@ void Heightmap::populate_raw_at_position(int camX, int camZ, int range) {
 	std::vector<Vertex> vertices( height * width );
 	std::vector<unsigned int> indices( height * width * 6 );
 	
-	add_vertices_3(vertices, indices, glm::vec2( ( camZ - range ), ( camX - range ) ), glm::vec2( ( camZ + range ), ( camX + range ) ) );
+	add_vertices_4(vertices, indices, glm::vec2( ( camZ - range ), ( camX - range ) ), glm::vec2( ( camZ + range ), ( camX + range ) ) );
 
-	last_raw = std::pair<std::vector<Vertex>, std::vector<unsigned int>>(vertices, indices);
+	last_raw = new Mesh(vertices, indices);
+}
+
+void Heightmap::populate_elements(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2 & begin, const glm::vec2 & end)
+{
+	add_vertices_4(vertices, indices, begin, end);
 }
 
 glm::vec3 Heightmap::get_position()
@@ -52,80 +62,47 @@ glm::vec3 Heightmap::get_position()
 	return position;
 }
 
-std::pair<std::vector<Vertex>, std::vector<unsigned int>>* Heightmap::get_last_raw()
+float Heightmap::get_max_height() {
+	return max_height;
+}
+
+Mesh* Heightmap::get_last_raw()
 {
-	return &last_raw;
+	return last_raw;
 }
 
 Heightmap::~Heightmap()
 {
+	delete last_raw;
 }
 
-void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2& begin, const glm::vec2& end)
-{
-	glm::vec2 size = end - begin;
+void Heightmap::add_vertices_4(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::ivec2& begin, const glm::ivec2& end) {
 
-	int width = size.x;
-	int height = size.y;
+	glm::ivec2 size = end - begin + glm::ivec2(1,1);
 
-	float tX = 0.0f;
-	float tY = size.y * texture_resolution;
-
-	int i = 0;
 	int j = 0;
+	int i = 0;
 
-	int lastZ = begin.y;
+	// generate mesh
+	for (i = 0; i < vertices.size(); i++) {
+		const int chunk_x = i % (size.y);
+		const int chunk_z = i / (size.y);
 
-	int beginX = begin.x;
-	int beginY = begin.y;
+		const int e[4] = {
+			i,					// this
+			i - 1,				// left
+			i - (size.y),		// bottom
+			i - (size.y) - 1    // bottom - left
+		};
 
-	for (int i = 0; i < vertices.size(); i++) {
+		const float x = (chunk_x + begin.x) * resolution;
+		const float z = (chunk_z + begin.y) * resolution;
 
-		int x = ( i % width + beginX) * resolution;
+		const FN_DECIMAL y = get_value_at(x, z, max_height);
+		vertices[i].position = { (float)x, (float)y, (float)z };
+		vertices[i].uv = { chunk_x * texture_resolution, chunk_z * texture_resolution };
 
-		x == beginX ? tX = 0.0f : tX += 1.0f * texture_resolution; // for every increase in x, increase tX, and reset tX to 0 when x = 0
-
-		int z = ( i / width + beginY) * resolution;
-
-		if (z != lastZ) { // for every increase in z, decrease tY
-			tY -= 1.0f * texture_resolution;
-			lastZ+= resolution;
-		}
-
-		const float y = get_value_at(x, z, max_height);
-		vertices[i].position = { x, y, z };
-		vertices[i].texture = { tX, tY, get_material_at(y) };
-		//vertices[i].normal = { 0, 0, 0 };
-
-		if (z == beginY * resolution || x == beginX * resolution) {
-			// a vertex with either z or x equaling their beginning values is missing neighboring vertices requried to construct the quad
-			// just add vertex to vertices vector and continue
-			continue;
-		}
-
-		if (z != beginY * resolution && x != beginX * resolution) {
-			// movement on both axis
-			// there are vertices prior to this one on the row
-			// there is at least 1 row above this one
-			// there is enough information to construct a quad
-			// generate this vertex, find indices of other 3 vertices, calculate normals and save their indices
-
-			const int e[4] = {
-				i - size.y - 1,	// upper - left
-				i - 1,			// left
-				i - size.y,		// up
-				i				// this
-			};
-
-			Vertex* v1 = &vertices[e[0]];
-			Vertex* v2 = &vertices[e[1]];
-			Vertex* v3 = &vertices[e[2]];
-			Vertex* v4 = &vertices[e[3]];
-
-			v1->calc_normal(*v2, *v3);
-			v2->calc_normal(*v1, *v3);
-			v3->calc_normal(*v2, *v4);
-			v4->calc_normal(*v2, *v3);
+		if (chunk_x != 0 && chunk_z != 0) {
 
 			indices[j + 0] = e[0];
 			indices[j + 1] = e[1];
@@ -137,11 +114,41 @@ void Heightmap::add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsign
 			j += 6;
 		}
 	}
+
+	// calc normals
+	for (int i = 0; i < vertices.size(); i++) {
+		// Required verts: x + 1, y + 1; x + 1, y - 1; x - 1; y + 1; x - 1; y - 1
+		// Calculate i at each
+		// if new index is less than i, the vertex has already been generated
+		// if new index is more than i, the vertex has not yet been generated
+		// if the vertex has already been generated, get it from the vertices vector and use the data
+		// if the vertex has not yet been generated, generate a new value at those coordinates.
+
+		const float x = (i % size.y + begin.x) * resolution;
+		const float z = (i / size.y + begin.y) * resolution;
+
+		float hA = x == end.x * resolution || x == begin.x * resolution || (i + size.y + 1) >= vertices.size() ? get_value_at(x + resolution, z + resolution) : vertices[i + size.x + 1].position.y / max_height;
+		float hC = x == end.x * resolution || x == begin.x * resolution || (i - size.y - 1) <= 0 ? get_value_at(x - resolution, z - resolution) : vertices[i - size.x - 1].position.y / max_height;
+		float hD = x == end.x * resolution || x == begin.x * resolution || (i - size.y + 1) <= 0 ? get_value_at(x + resolution, z - resolution) : vertices[i - size.x + 1].position.y / max_height;
+		float hB = x == end.x * resolution || x == begin.x * resolution || (i + size.y - 1) >= vertices.size() ? get_value_at(x - resolution, z + resolution) : vertices[i + size.x - 1].position.y / max_height;
+
+		vertices[i].normal = glm::normalize(glm::vec3(hA - hC, 0.1, hD - hB));
+	}
 }
 
 
-float Heightmap::get_value_at(int x, int y, float amplification) {
-	return amplification * ( ( ( noise_generator.GetNoise(x, y) + 0.5f ) * (noise_generator.GetCellular(x, y) ) ) - 0.7f );
+FN_DECIMAL Heightmap::get_value_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification) {
+	return amplification * ( ( ( noise_generator.GetNoise(x, y) + (FN_DECIMAL) 0.5f ) * (noise_generator.GetCellular(x, y) ) ) - (FN_DECIMAL) 0.7f );
+}
+
+glm::vec3 Heightmap::get_normal_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification)
+{
+	float hL = get_value_at(x - resolution, y - resolution);
+	float hR = get_value_at(x + resolution, y + resolution);
+	float hD = get_value_at(x + resolution, y - resolution);
+	float hU = get_value_at(x - resolution, y + resolution);
+
+	return glm::normalize( glm::vec3( hL - hR, 0.1, hD - hU ) );
 }
 
 Heightmap::Material Heightmap::get_material_at ( float height )

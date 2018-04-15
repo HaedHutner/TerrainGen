@@ -1,4 +1,4 @@
-#version 430 core
+#version 330 core
 
 in vec3 texture_coordinates;
 in vec3 surface_normal;
@@ -16,9 +16,6 @@ const vec3 light_ambient = vec3(0.1, 0.1, 0.1);
 
 const vec3 sky_color = vec3(0.3, 0.1, 0.0);
 
-const float reflectivity = 0.00;
-const float shine_damper = 0.00;
-
 void main()
 {
 	vec3 unit_normal = normalize(surface_normal);
@@ -33,12 +30,6 @@ void main()
 	vec3 diffuse			 = brightness * light_color + light_ambient;
 	vec3 reflected_light_dir = reflect ( light_direction, unit_normal );
 
-	float specular_factor = dot ( reflected_light_dir, unit_camera );
-	specular_factor		  = max ( specular_factor, 0.0 );
-
-	float damped_factor = pow( specular_factor, shine_damper );
-	vec3 final_specular = damped_factor * reflectivity * light_color;
-
-	out_color = vec4 ( diffuse, 1.0 ) * texture( textures, texture_coordinates ) + vec4 ( final_specular, 1.0 );
+	out_color = vec4 ( diffuse, 1.0 ) * texture( textures, texture_coordinates );
 	out_color = mix ( vec4( sky_color, 1.0 ), out_color, visibility );
 }

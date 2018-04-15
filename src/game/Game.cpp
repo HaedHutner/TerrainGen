@@ -23,8 +23,8 @@ namespace Game {
 			return false;
 		}
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_SAMPLES, 4);
 
@@ -52,19 +52,24 @@ namespace Game {
 		Log::info((const char*)glGetString(GL_VERSION));
 		Log::info((const char*)glGetString(GL_VENDOR));
 
-		Heightmap* map = new Heightmap( 112412, FastNoise::NoiseType::PerlinFractal, FastNoise::FractalType::FBM, glm::vec3 (0, 0, 0), 0.2f, 7, 2, 128.0f);
+		Heightmap* map = new Heightmap( 112412, FastNoise::NoiseType::PerlinFractal, FastNoise::FractalType::FBM, glm::vec3 (0, 0, 0), 0.2f, 7, 4, 128.0f);
 
 		Log::info("Loading Shaders...");
-		ShaderProgram heightmapProgram = ShaderProgram::from_files("shaders/heightmap_vertex.shader", "shaders/heightmap_fragment.shader");
-		ShaderProgram skyboxProgram = ShaderProgram::from_files("shaders/cubemap_vertex.shader", "shaders/cubemap_fragment.shader");
-		ShaderProgram asteroidProgram = ShaderProgram::from_files("shaders/asteroid_vertex.shader", "shaders/asteroid_fragment.shader");
+		ShaderProgram heightmapProgram = ShaderProgram::from_files("resources/shaders/heightmap_vertex.shader", "resources/shaders/heightmap_fragment.shader");
+		ShaderProgram skyboxProgram = ShaderProgram::from_files("resources/shaders/cubemap_vertex.shader", "resources/shaders/cubemap_fragment.shader");
+		ShaderProgram asteroidProgram = ShaderProgram::from_files("resources/shaders/asteroid_vertex.shader", "resources/shaders/asteroid_fragment.shader");
 		Log::info("Shaders Loaded.");
 
 		camera = new Camera(120.0f, 5.0f, 0.5f, SCREEN_X, SCREEN_Y, { 0, 128.0f, 0 }, { 0, 0, 0 }, { -89.0f, -89.0f });
 		renderer = new MasterRenderer(camera);
-		renderer->add_renderer(new HeightmapRenderer(heightmapProgram, camera, map, { "textures/mars_rock.png", "textures/mars_gravel.png", "textures/mars_grass.png", "textures/mars_sand.png" }));
+		//renderer->add_renderer(new HeightmapRenderer(heightmapProgram, camera, map, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }));
 
-		Skybox* skybox = new Skybox({ "textures/skybox_left.png", "textures/skybox_right.png","textures/skybox_top.png","textures/skybox_bottom.png","textures/skybox_back.png","textures/skybox_front.png" });
+		World* world = new World(map, glm::ivec2(64,64));
+
+		Light* sun = new Light(glm::vec3(0, 100, 0), glm::vec3(1, 1, 1));
+		renderer->add_renderer(new WorldRenderer(world, sun, { "resources/textures/mars_rock.png", "resources/textures/mars_gravel.png", "resources/textures/mars_grass.png", "resources/textures/mars_sand.png" }, camera, heightmapProgram));
+
+		Skybox* skybox = new Skybox({ "resources/textures/skybox_left.png", "resources/textures/skybox_right.png","resources/textures/skybox_top.png","resources/textures/skybox_bottom.png","resources/textures/skybox_back.png","resources/textures/skybox_front.png" });
 		renderer->add_renderer(new CubemapRenderer(skyboxProgram, camera, skybox));
 
 		//renderer->add_renderer(new AsteroidRenderer(asteroidProgram, camera));
@@ -114,7 +119,7 @@ namespace Game {
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 			if (INSTANCE->mouse_enabled) {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-				INSTANCE->camera->reset_cursor(INSTANCE->screen_x / 2, INSTANCE->screen_y / 2);
+				INSTANCE->camera->reset_cursor( (float) INSTANCE->screen_x / 2, (float) INSTANCE->screen_y / 2);
 			}
 			else {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

@@ -1,16 +1,16 @@
 #pragma once
 
-#include <CImg.h>
-
 #include <math.h>
 #include <vector>
 #include <string>
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
+#include <thread>
 
 #include "../../noise/FastNoise.h"
-#include "../../engine/Vertex.h"
+#include "../../engine/objects/Vertex.hpp"
+#include "../../engine/objects/Mesh.h"
 #include "Light.h"
 
 class Heightmap {
@@ -23,7 +23,7 @@ class Heightmap {
 
 	glm::vec3 position;
 
-	std::pair<std::vector<Vertex>, std::vector<unsigned int>> last_raw;
+	Mesh* last_raw;
 
 	enum Material {
 		ROCK = 0,
@@ -36,23 +36,31 @@ public:
 
 	Heightmap(int seed, FastNoise::NoiseType type, FastNoise::FractalType fractalType, glm::vec3 position, float textureRes = 0.5f, int octaves = 5, int resolution = 4, float maxHeight = 64.0f);
 
+	Heightmap(const Heightmap&) = delete;
+
 	// For static drawing
 	void populate_raw(int height, int width);
 
 	// for procedural drawing
 	void populate_raw_at_position(int camX, int camZ, int range = 10);
 
+	void populate_elements(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2& begin, const glm::vec2& end);
+
 	glm::vec3 get_position();
 
-	std::pair<std::vector<Vertex>, std::vector<unsigned int>>* get_last_raw();
+	float get_max_height();
+
+	Mesh* get_last_raw();
 
 	~Heightmap();
 
 private:
 
-	void add_vertices_3(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::vec2& begin, const glm::vec2& end);
+	void add_vertices_4 (std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, const glm::ivec2& begin, const glm::ivec2& end);
 
-	float get_value_at(int x, int y, float amplification = 1.0f);
+	FN_DECIMAL get_value_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification = 1.0f);
+
+	glm::vec3 get_normal_at(FN_DECIMAL x, FN_DECIMAL y, FN_DECIMAL amplification = 1.0f);
 
 	Material get_material_at( float height );
 };
